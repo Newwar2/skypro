@@ -1,33 +1,51 @@
-def mask_card_number(card_number: str) -> str:
-    """
-    Маскирует номер карты по шаблону: XXXX XXXX XXXX XXXX,
-    где X — видимые цифры (первые 6 и последние 4),
-    остальные заменяются на *.
-    """
-    if len(card_number) != 16 or not card_number.isdigit():
-        raise ValueError("Номер карты должен содержать 16 цифр")
-
-    return f"{card_number[:4]} {card_number[4:8]} {card_number[8:12]} **** {card_number[-4:]}"
+from src.masks import get_mask_card_number  # предполагаем, что эта функция уже есть
+from datetime import datetime, date
 
 
-
-def mask_account_number(account_number: str) -> str:
-    """
-    Маскирует номер счёта по шаблону: *************XX,
-    где видны только последние 2 цифры, остальные заменяются на *.
-    """
-    if not account_number.isdigit():
-        raise ValueError("Номер счёта должен содержать только цифры")
-
+def get_mask_account(account_number: str) -> str:
+    """Маскирует номер счёта: оставляет последние 2 цифры, остальные заменяет на **."""
     if len(account_number) < 2:
-        raise ValueError("Номер счёта слишком короткий")
+        raise ValueError("Номер счёта должен содержать минимум 2 цифры")
+    return f"**{account_number[-2:]}"
 
-    masked = "*" * (len(account_number) - 2) + account_number[-2:]
-    # Разбиваем на группы по 4 символа для читаемости
-    chunks = [masked[i:i + 4] for i in range(0, len(masked), 4)]
-    return " ".join(chunks)
+def get_date(date_string: str = None, date_format: str = '%Y-%m-%d') -> datetime | date:
+    """
+    Если передана строка — парсит дату из строки.
+    Если строка не передана — возвращает текущую дату.
+    """
+    if date_string is None:
+        return date.today()
 
-def get_date_manual(iso_date_string: str) -> str:
-    date_part = iso_date_string.split('T')[0]  # Берём часть до 'T'
-    year, month, day = date_part.split('-')
-    return f"{day}.{month}.{year}"
+    try:
+        return datetime.strptime(date_string, date_format)
+    except ValueError as e:
+        raise ValueError(
+            f"Некорректный формат даты: '{date_string}'. "
+            f"Ожидаемый формат: '{date_format}'"
+        ) from e
+
+def mask_account_card(date: str) -> str:
+    """Принимаем строку с типом и номером карты или счёта, возвращаем замаскированный результат."""
+    # Проверка на пустую строку
+    if not date or not date.strip():
+        raise ValueError("Входная строка не может быть пустой")
+
+    # Разделение строки на тип и номер
+    parts = date.rsplit(sep=' ', maxsplit=1)
+
+    # Проверка, что получилось ровно две части
+    if len(parts) != 2:
+        raise ValueError(f"Некорректный формат входной строки: '{date}'. Ожидаемый формат: 'Тип Номер'")
+
+    name, number = parts
+
+    # Приведение типа к нижнему регистру и удаление лишних пробелов
+    account_type = name.lower().strip()
+
+    if account_type in ('счёт', 'счет'):
+        masked_number = get_mask_account(number)
+    else:
+        masked_number = get_mask_card_number(number)
+
+    return f'{name} {masked_number}'
+
