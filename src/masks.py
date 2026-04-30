@@ -5,3 +5,11 @@ def get_mask_card_number(card: str) ->str:
         return "Не корректный номер карты"
     else:
         return f"{card[:4]} {card[4:6]}** **** {card[-4:]}"
+
+def get_mask_account(account: str) ->str:
+    """Функция скрытия номера счета"""
+
+    if len(account) < 4:
+        return "Не корректный номер счета"
+    else:
+        return f"**{account[-4:]}"
