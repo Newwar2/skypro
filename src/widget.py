@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from src.masks import get_mask_card_number, get_mask_account
 
-def mask_account_card(mai_string: str) ->str:
+
+def mask_account_card(mai_string: str) -> str:
     """Функция обработки введенных данных Счет или Карта
     и вывода замаскированной информации"""
 
@@ -12,6 +15,9 @@ def mask_account_card(mai_string: str) ->str:
     else:
         return card
 
-if __name__ == '__main__':
-    print(mask_account_card("Maestro 1596837868705199"))
-    print(mask_account_card("Счет 64686473678894779589"))
+
+def get_date(date: str) -> str:
+    """Функция возврата времени в формате ДД.ММ.ГГГГ"""
+
+    new_date = datetime.fromisoformat(date).strftime("%d.%m.%Y")
+    return new_date

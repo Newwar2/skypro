@@ -1,4 +1,4 @@
-def get_mask_card_number(card: str) ->str:
+def get_mask_card_number(card: str) -> str:
     """Функция скрытие номера карты"""
 
     if len(card) < 16:
@@ -6,7 +6,8 @@ def get_mask_card_number(card: str) ->str:
     else:
         return f"{card[:-12]} {card[-12:-10]}** **** {card[-4:]}"
 
-def get_mask_account(account: str) ->str:
+
+def get_mask_account(account: str) -> str:
     """Функция скрытия номера счета"""
 
     if len(account) < 4:
