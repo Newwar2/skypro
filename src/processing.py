@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def filter_by_state(my_list: list[dict], state: str = "EXECUTED") -> list[dict]:
     """Функция принимает список словарей и возвращает новый список словарей"""
     new_list = []
@@ -9,5 +12,9 @@ def filter_by_state(my_list: list[dict], state: str = "EXECUTED") -> list[dict]:
 
 def sort_by_date(my_list: list[dict], type_sort: bool = True) -> list[dict]:
     """Функция принимает список словарей и возвращает новый список словарей отсортированный по умолчанию — убывание"""
-    new_list = sorted(my_list, key=lambda a: a["date"], reverse=type_sort)
+    new_list = sorted(my_list,
+                      key=lambda a: datetime.strftime(a["date"], "%Y-%m-%d"),
+                      reverse=type_sort
+                      )
+
     return new_list
