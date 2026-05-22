@@ -21,3 +21,4 @@ def get_date(date: str) -> str:
 
     new_date = datetime.fromisoformat(date).strftime("%d.%m.%Y")
     return new_date
+
