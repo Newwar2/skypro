@@ -1,5 +1,5 @@
 def filter_by_currency(my_list: list[dict], code: str) -> dict:
-    """ " Принимаем список словарей , возвращаем итератор."""
+    """Принимаем список словарей , возвращаем итератор."""
     for x in my_list:
         if x.get("operationAmount", {}).get("currency", {}).get("code") == code:
             yield x

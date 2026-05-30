@@ -1,0 +1,7 @@
+
+my_func ok
+my_func: unsupported operand type(s) for /: 'str' and 'int'. Inputs: ('d', 2), {}
+my_func: unsupported operand type(s) for /: 'str' and 'int'. Inputs: ('d', 2), {}
+my_func ok
+my_func: division by zero. Inputs: (15, 0), {}
+my_func: division by zero. Inputs: (15, 0), {}
