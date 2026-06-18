@@ -24,8 +24,3 @@ def log(filename=None):
         return wrapper
 
     return decarator
-
-
-@log(filename="..\\logs\\mylog.txt")
-def my_func(a, b):
-    return a / b
