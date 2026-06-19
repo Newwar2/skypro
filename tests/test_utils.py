@@ -9,7 +9,7 @@ def test_read_json(utils_json):
     test = Mock(return_value=utils_json)
     json.load = test
     way_file = os.path.join(ROOT_DIR, "data", "operations.json")
-    assert read_json(way_file) == utils_json
+    assert read_json(way_file) == [utils_json]
 
 
 def test_read_json_success():
