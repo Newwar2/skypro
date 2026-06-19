@@ -15,5 +15,8 @@ def operation(code):
     result = data["Valute"][code][
         "Value"
     ]  # проваливаемся в словарь,выбираем валюту,code-EUR,RUB,и тд.,Value-курс на сегодня
-
     return result
+
+
+if __name__ == "__main__":
+    print(operation("USD"))
