@@ -1,6 +1,6 @@
 import pytest
-import os
 from src.decorators import log
+
 
 @log()
 def add(a, b):
@@ -14,6 +14,7 @@ def test_log_success(capsys):
 
     assert result == 5
     assert "add ok" in captured.out
+
 
 @log()
 def fail_function():

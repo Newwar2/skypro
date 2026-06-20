@@ -1,6 +1,5 @@
 import json
 from json import JSONDecodeError
-
 from src.external_api import operation
 
 

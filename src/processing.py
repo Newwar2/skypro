@@ -1,6 +1,3 @@
-from datetime import datetime
-
-
 def filter_by_state(my_list: list[dict], state: str = "EXECUTED") -> list[dict]:
     """Функция принимает список словарей и возвращает новый список словарей"""
     new_list = []

@@ -1,7 +1,3 @@
-import os
-from pyexpat.errors import messages
-
-
 def log(filename=None):
     """Декоратор log, автоматически логирует начало и конец выполнения функции, ее результаты и возникшие ошибки."""
 

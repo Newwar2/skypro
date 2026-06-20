@@ -63,43 +63,65 @@ def test_gen_2():
 
 @pytest.fixture
 def utils_json():
-    return [[{'date': '2019-08-26T10:50:58.294041',
-   'description': 'Перевод организации',
-   'from': 'Maestro 1596837868705199',
-   'id': 441945886,
-   'operationAmount': {'amount': '31957.58',
-                       'currency': {'code': 'RUB', 'name': 'руб.'}},
-   'state': 'EXECUTED',
-   'to': 'Счет 64686473678894779589'},
-  {'date': '2019-07-03T18:35:29.512364',
-   'description': 'Перевод организации',
-   'from': 'MasterCard 7158300734726758',
-   'id': 41428829,
-   'operationAmount': {'amount': '8221.37',
-                       'currency': {'code': 'USD', 'name': 'USD'}},
-   'state': 'EXECUTED',
-   'to': 'Счет 35383033474447895560'}]] != [{'date': '2019-08-26T10:50:58.294041',
-  'description': 'Перевод организации',
-  'from': 'Maestro 1596837868705199',
-  'id': 441945886,
-  'operationAmount': {'amount': '31957.58',
-                      'currency': {'code': 'RUB', 'name': 'руб.'}},
-  'state': 'EXECUTED',
-  'to': 'Счет 64686473678894779589'},
- {'date': '2019-07-03T18:35:29.512364',
-  'description': 'Перевод организации',
-  'from': 'MasterCard 7158300734726758',
-  'id': 41428829,
-  'operationAmount': {'amount': '8221.37',
-                      'currency': {'code': 'USD', 'name': 'USD'}},
-  'state': 'EXECUTED',
-  'to': 'Счет 35383033474447895560'}]
+    return [
+        [
+            {
+                "date": "2019-08-26T10:50:58.294041",
+                "description": "Перевод организации",
+                "from": "Maestro 1596837868705199",
+                "id": 441945886,
+                "operationAmount": {"amount": "31957.58", "currency": {"code": "RUB", "name": "руб."}},
+                "state": "EXECUTED",
+                "to": "Счет 64686473678894779589",
+            },
+            {
+                "date": "2019-07-03T18:35:29.512364",
+                "description": "Перевод организации",
+                "from": "MasterCard 7158300734726758",
+                "id": 41428829,
+                "operationAmount": {"amount": "8221.37", "currency": {"code": "USD", "name": "USD"}},
+                "state": "EXECUTED",
+                "to": "Счет 35383033474447895560",
+            },
+        ]
+    ] != [
+        {
+            "date": "2019-08-26T10:50:58.294041",
+            "description": "Перевод организации",
+            "from": "Maestro 1596837868705199",
+            "id": 441945886,
+            "operationAmount": {"amount": "31957.58", "currency": {"code": "RUB", "name": "руб."}},
+            "state": "EXECUTED",
+            "to": "Счет 64686473678894779589",
+        },
+        {
+            "date": "2019-07-03T18:35:29.512364",
+            "description": "Перевод организации",
+            "from": "MasterCard 7158300734726758",
+            "id": 41428829,
+            "operationAmount": {"amount": "8221.37", "currency": {"code": "USD", "name": "USD"}},
+            "state": "EXECUTED",
+            "to": "Счет 35383033474447895560",
+        },
+    ]
+
 
 @pytest.fixture
 def utils_convertation():
-    return {'Date': '2026-06-18T11:30:00+03:00',
-            'PreviousDate': '2026-06-17T11:30:00+03:00',
-            'PreviousURL': '//www.cbr-xml-daily.ru/archive/2026/06/17/daily_json.js',
-            'Timestamp': '2026-06-18T14:00:00+03:00', 'Valute': {'AUD': {'ID': 'R01010',
-            'NumCode': '036', 'CharCode': 'AUD', 'Nominal': 1, 'Name': 'Австралийский доллар',
-            'Value': 5, 'Previous': 50.8434}}}
+    return {
+        "Date": "2026-06-18T11:30:00+03:00",
+        "PreviousDate": "2026-06-17T11:30:00+03:00",
+        "PreviousURL": "//www.cbr-xml-daily.ru/archive/2026/06/17/daily_json.js",
+        "Timestamp": "2026-06-18T14:00:00+03:00",
+        "Valute": {
+            "AUD": {
+                "ID": "R01010",
+                "NumCode": "036",
+                "CharCode": "AUD",
+                "Nominal": 1,
+                "Name": "Австралийский доллар",
+                "Value": 5,
+                "Previous": 50.8434,
+            }
+        },
+    }
