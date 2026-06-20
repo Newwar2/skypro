@@ -11,12 +11,12 @@ def test_filter_by_state(test_my_list):
     ]
 
 
-def test_sort_by_date(test_my_list_2):
-    assert sort_by_date(test_my_list_2) == [
+def test_sort_by_date(test_my_list):
+    assert sort_by_date(test_my_list) == [
         {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
         {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
     ]
-    assert sort_by_date(test_my_list_2, False) == [
+    assert sort_by_date(test_my_list, False) == [
         {"date": "2018-10-14T08:21:33.419441", "id": 615064591, "state": "CANCELED"},
         {"date": "2019-07-03T18:35:29.512364", "id": 41428829, "state": "EXECUTED"},
     ]

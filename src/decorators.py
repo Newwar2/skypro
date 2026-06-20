@@ -1,8 +1,15 @@
-def log(filename=None):
+from functools import wraps
+from typing import Any, Callable
+
+from config import ROOT_DIR
+
+
+def log(filename: str | None = None) -> Callable:
     """Декоратор log, автоматически логирует начало и конец выполнения функции, ее результаты и возникшие ошибки."""
 
-    def decarator(func):
-        def wrapper(*args, **kwargs):
+    def decarator(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(*args: tuple, **kwargs: dict) -> Any:
             mes = ""
             try:
                 result = func(*args, **kwargs)
@@ -12,7 +19,7 @@ def log(filename=None):
                 mes = f"{func.__name__}: {err}. Inputs: {args}, {kwargs}\n"
             finally:
                 if filename:
-                    with open(filename, "a", encoding="utf-8") as file:
+                    with open(f"{ROOT_DIR}//logs//{filename}", "a", encoding="utf-8") as file:
                         file.write(mes)
                 else:
                     print(mes)

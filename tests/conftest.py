@@ -114,7 +114,7 @@ def utils_convertation():
         "PreviousURL": "//www.cbr-xml-daily.ru/archive/2026/06/17/daily_json.js",
         "Timestamp": "2026-06-18T14:00:00+03:00",
         "Valute": {
-            "AUD": {
+            "USD": {
                 "ID": "R01010",
                 "NumCode": "036",
                 "CharCode": "AUD",

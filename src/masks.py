@@ -4,7 +4,7 @@ def get_mask_card_number(card: str) -> str:
     if len(card) < 16:
         return "Некорректный номер карты"
     else:
-        return f"{card[:-12]}{card[-12:-10]}** **** {card[-4:]}"
+        return f"{card[:-12]} {card[-12:-10]}** **** {card[-4:]}"
 
 
 def get_mask_account(account: str) -> str:

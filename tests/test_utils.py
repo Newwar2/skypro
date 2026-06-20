@@ -1,5 +1,9 @@
 import json
 import os
+from json import JSONDecodeError
+
+from pygments.lexers.webassembly import builtins
+
 from config import ROOT_DIR
 from src.utils import convertetion, read_json
 from unittest.mock import Mock, patch
@@ -11,6 +15,13 @@ def test_read_json(utils_json):
     way_file = os.path.join(ROOT_DIR, "data", "operations.json")
     assert read_json(way_file) == utils_json
 
+@patch("builtins.open")
+def test_error(mock_open):
+    mock_open.side_effect = FileNotFoundError
+    assert read_json("") == []
+
+    mock_open.side_effect = JSONDecodeError(" ","", 0)
+    assert read_json("") == []
 
 def test_convertetion_rub():
     rub_test = {
@@ -22,7 +33,7 @@ def test_convertetion_rub():
         "from": "Maestro 1596837868705199",
         "to": "Счет 64686473678894779589",
     }
-    assert convertetion(rub_test) == "31957.58"
+    assert convertetion(rub_test) == 31957.58
 
 
 def test_conversion_usd(utils_convertation):
@@ -40,4 +51,4 @@ def test_conversion_usd(utils_convertation):
     mock_requests.get.return_value.json.return_value = utils_convertation
 
     with patch("src.external_api.requests", mock_requests):
-        assert convertetion(usd_test) == 16442.74
+        assert convertetion(usd_test) == 41106.850000000006

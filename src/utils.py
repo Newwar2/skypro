@@ -1,9 +1,11 @@
 import json
 from json import JSONDecodeError
+from typing import Any
+
 from src.external_api import operation
 
 
-def read_json(path_json):
+def read_json(path_json: str) -> Any:
     """Функция, которая принимает на вход путь до JSON-файла и возвращает список словарей
     с данными о финансовых транзакциях."""
     try:
@@ -17,14 +19,13 @@ def read_json(path_json):
     return data
 
 
-def convertetion(transaction):
+def convertetion(transaction: dict) -> float:
     """Функция, которая принимает на вход транзакцию и возвращает сумму транзакции (amount) в рублях."""
-
-    if transaction["operationAmount"]["currency"]["code"] == "RUB":
-        return transaction["operationAmount"]["amount"]
+    code: str = transaction["operationAmount"]["currency"]["code"]  # показывает, что используется другая валюта
+    rub_pay: float = float(transaction["operationAmount"]["amount"])
+    if code == "RUB":
+        return rub_pay
     else:
-        code = transaction["operationAmount"]["currency"]["code"]  # показывает, что используется другая валюта
-        kurs = round(operation(code))
-        rub_pay = float(transaction["operationAmount"]["amount"])
-        result = rub_pay * kurs
+        kurs: float = round(operation(code))
+        result: float = rub_pay * kurs
         return result
