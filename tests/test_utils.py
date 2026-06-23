@@ -2,7 +2,7 @@ import json
 import os
 from json import JSONDecodeError
 
-from pygments.lexers.webassembly import builtins
+#from pygments.lexers.webassembly import builtins
 
 from config import ROOT_DIR
 from src.utils import convertetion, read_json

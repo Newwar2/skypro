@@ -1,11 +1,13 @@
 from src.masks import get_mask_account, get_mask_card_number
 from src.widget import mask_account_card
 
+
 if __name__ == "__main__":
 # result_1 = csv_reader("data/transactions.csv")
 # print(result_1)
 # result_2 = excel_reader("data/transactions_excel.xlsx")
 # print(result_2)
+
 
     print(mask_account_card("Maestro 1596837868705199"))
     print(mask_account_card("Счет 64686473678894779589"))
