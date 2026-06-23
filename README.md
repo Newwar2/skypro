@@ -39,10 +39,10 @@ https://github.com/Newwar2/skypro.git
 ### Созданы: src(init, masks, processing, widget);
  tests(init, flake8, gitignore, main, poetry.lock, pyproject.toml)  
  
-### Создаy новый модуль в  проекте под названием generators. 
+### Создан новый модуль в  проекте под названием generators. 
 Работа с функциями filter_by_currency, transaction_descriptions, card_number_generator.
 Выполнены тесты для этих функций.
 
-### Сщздали новый модуль decorators, создали Декоратор log.
+### Создали новый модуль decorators, создали Декоратор log.
 Декоратор log автоматически логирует начало 
 и конец выполнения функции, ее результаты и возникшие ошибки. Проверили функцию тестированием.
