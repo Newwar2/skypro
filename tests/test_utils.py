@@ -74,7 +74,7 @@ def test_read_csv(mock_df):
     assert result_1[0]["id"] == 41428829
 
 
-@patch("pandas.read_csv")
+@patch("pandas.read_excel")
 def test_read_excel(mock_df):
     mock_df.return_value = pandas.DataFrame(
         [
