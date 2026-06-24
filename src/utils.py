@@ -1,9 +1,13 @@
 import json
-from json import JSONDecodeError
-from typing import Any
-from src.external_api import operation
 import logging
+from json import JSONDecodeError
 from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+from config import ROOT_DIR
+from src.external_api import operation
 
 current_file = Path(__file__)
 project_root = current_file.parent.parent
@@ -58,3 +62,38 @@ def convertetion(transaction: dict) -> float:
         result: float = rub_pay * kurs
         logger_utils.info("Конвертация выполнена")
         return result
+
+
+def transactions_csv(file_path):
+    # 1. Превращаем строку пути в удобный объект Path
+    file_path = f"{ROOT_DIR}//{file_path}"
+    path = Path(file_path)
+
+    # 2. Проверяем: существует ли файл и является ли он файлом (а не папкой)
+    if not path.is_file():
+        raise FileNotFoundError(f"Файл не найден: {file_path}")
+
+    # 3. Пробуем прочитать файл. Сначала UTF-8, если не вышло — пробуем CP1251 (для русских файлов)
+    try:
+        df = pd.read_csv(path, encoding="utf-8", delimiter=";")
+    except UnicodeDecodeError:
+        df = pd.read_csv(path, encoding="cp1251", delimiter=";")
+
+    # 4. Превращаем таблицу в список словарей и возвращаем
+    return df.to_dict(orient="records")
+
+
+def transactions_excel(file_path):
+    # 1. Превращаем строку пути в удобный объект Path
+    file_path = f"{ROOT_DIR}//{file_path}"
+    path = Path(file_path)
+
+    # 2. Проверяем: существует ли файл и является ли он файлом (а не папкой)
+    if not path.is_file():
+        raise FileNotFoundError(f"Файл не найден: {file_path}")
+
+    # 3. Пробуем прочитать файл.
+    df = pd.read_excel(path)
+
+    # 4. Превращаем таблицу в список словарей и возвращаем
+    return df.to_dict(orient="records")

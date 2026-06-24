@@ -1,11 +1,11 @@
 import json
 import os
 from json import JSONDecodeError
-
-#from pygments.lexers.webassembly import builtins
+import pandas
+# from pygments.lexers.webassembly import builtins
 
 from config import ROOT_DIR
-from src.utils import convertetion, read_json
+from src.utils import convertetion, read_json, transactions_csv, transactions_excel
 from unittest.mock import Mock, patch
 
 
@@ -15,13 +15,15 @@ def test_read_json(utils_json):
     way_file = os.path.join(ROOT_DIR, "data", "operations.json")
     assert read_json(way_file) == utils_json
 
+
 @patch("builtins.open")
 def test_error(mock_open):
     mock_open.side_effect = FileNotFoundError
     assert read_json("") == []
 
-    mock_open.side_effect = JSONDecodeError(" ","", 0)
+    mock_open.side_effect = JSONDecodeError(" ", "", 0)
     assert read_json("") == []
+
 
 def test_convertetion_rub():
     rub_test = {
@@ -52,3 +54,39 @@ def test_conversion_usd(utils_convertation):
 
     with patch("src.external_api.requests", mock_requests):
         assert convertetion(usd_test) == 41106.850000000006
+
+
+@patch("pandas.read_csv")
+def test_read_csv(mock_df):
+    mock_df.return_value = pandas.DataFrame(
+        [
+            {
+                "id": 41428829,
+                "state": "EXECUTED",
+                "date": "2019-07-03T18:35:29.512364",
+                "description": "Перевод организации",
+                "from": "MasterCard 7158300734726758",
+                "to": "Счет 35383033474447895560",
+            }
+        ]
+    )
+    result_1 = transactions_csv("data/transactions.csv")
+    assert result_1[0]["id"] == 41428829
+
+
+@patch("pandas.read_csv")
+def test_read_excel(mock_df):
+    mock_df.return_value = pandas.DataFrame(
+        [
+            {
+                "id": 41428829,
+                "state": "EXECUTED",
+                "date": "2019-07-03T18:35:29.512364",
+                "description": "Перевод организации",
+                "from": "MasterCard 7158300734726758",
+                "to": "Счет 35383033474447895560",
+            }
+        ]
+    )
+    result_2 = transactions_excel("data/transactions_excel.xlsx")
+    assert result_2[0]["id"] == 650703.0

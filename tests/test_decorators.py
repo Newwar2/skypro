@@ -22,6 +22,7 @@ def test_file_log():
         assert "add_ ok" in data
     os.remove(file_name)
 
+
 def test_log_success(capsys):
     result = add(2, 3)
 
