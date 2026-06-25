@@ -2,6 +2,7 @@ import json
 import os
 from json import JSONDecodeError
 import pandas
+
 # from pygments.lexers.webassembly import builtins
 
 from config import ROOT_DIR
@@ -74,7 +75,7 @@ def test_read_csv(mock_df):
     assert result_1[0]["id"] == 41428829
 
 
-@patch("pandas.read_excel")
+@patch("pandas.read_excel ")
 def test_read_excel(mock_df):
     mock_df.return_value = pandas.DataFrame(
         [

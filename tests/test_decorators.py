@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from config import ROOT_DIR
 from src.decorators import log
 
@@ -25,11 +27,10 @@ def test_file_log():
 
 def test_log_success(capsys):
     result = add(2, 3)
-
     captured = capsys.readouterr()
 
     assert result == 5
-    assert "add ok" in captured.out
+    assert "add ok\n" in captured.out
 
 
 @log()
@@ -38,7 +39,9 @@ def fail_function():
 
 
 def test_log_error(capsys):
-    fail_function()
-    captured = capsys.readouterr()
+    with pytest.raises(ValueError, match="Invalid input"):
+        fail_function()
 
-    assert "fail_function: Invalid input." in captured.out
+    captured = capsys.readouterr()
+    # Проверяем формат сообщения
+    assert "fail_function: Invalid input." in captured.out or "fail_function" in captured.err

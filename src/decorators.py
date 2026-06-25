@@ -17,6 +17,7 @@ def log(filename: str | None = None) -> Callable:
                 return result
             except Exception as err:
                 mes = f"{func.__name__}: {err}. Inputs: {args}, {kwargs}\n"
+                raise
             finally:
                 if filename:
                     with open(f"{ROOT_DIR}//logs//{filename}", "a", encoding="utf-8") as file:
