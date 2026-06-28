@@ -11,7 +11,6 @@ from src.utils import convertetion, read_json, transactions_csv, transactions_ex
 # from pygments.lexers.webassembly import builtins
 
 
-
 def test_read_json(utils_json):
     test = Mock(return_value=utils_json)
     json.load = test
