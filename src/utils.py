@@ -2,7 +2,7 @@ import json
 import logging
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List
 
 import pandas as pd
 
@@ -45,7 +45,7 @@ def read_json(path_json: str) -> Any:
     return data
 
 
-def convertetion(transaction: dict) -> float:
+def conversion(transaction: dict) -> float:
     """Функция, которая принимает на вход транзакцию и возвращает сумму транзакции (amount) в рублях."""
     logger_utils.debug("Функция convertetion запущена, начинаем обработку транзакций")
     code: str = transaction["operationAmount"]["currency"]["code"]  # показывает, что используется другая валюта
@@ -64,7 +64,7 @@ def convertetion(transaction: dict) -> float:
         return result
 
 
-def transactions_csv(file_path):
+def transactions_csv(file_path: str) -> List[Dict[str, Any]]:
     # 1. Превращаем строку пути в удобный объект Path
     file_path = f"{ROOT_DIR}//{file_path}"
     path = Path(file_path)
@@ -83,7 +83,7 @@ def transactions_csv(file_path):
     return df.to_dict(orient="records")
 
 
-def transactions_excel(file_path):
+def transactions_excel(file_path: str) -> List[Dict[str, Any]]:
     # 1. Превращаем строку пути в удобный объект Path
     file_path = f"{ROOT_DIR}//{file_path}"
     path = Path(file_path)

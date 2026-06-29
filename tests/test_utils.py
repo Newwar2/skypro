@@ -6,9 +6,7 @@ from unittest.mock import Mock, patch
 import pandas
 
 from config import ROOT_DIR
-from src.utils import convertetion, read_json, transactions_csv, transactions_excel
-
-# from pygments.lexers.webassembly import builtins
+from src.utils import conversion, read_json, transactions_csv, transactions_excel
 
 
 def test_read_json(utils_json):
@@ -27,7 +25,7 @@ def test_error(mock_open):
     assert read_json("") == []
 
 
-def test_convertetion_rub():
+def test_conversion_rub():
     rub_test = {
         "id": 441945886,
         "state": "EXECUTED",
@@ -37,10 +35,10 @@ def test_convertetion_rub():
         "from": "Maestro 1596837868705199",
         "to": "Счет 64686473678894779589",
     }
-    assert convertetion(rub_test) == 31957.58
+    assert conversion(rub_test) == 31957.58
 
 
-def test_conversion_usd(utils_convertation):
+def test_conversion_usd(utils_conversion):
     usd_test = {
         "id": 41428829,
         "state": "EXECUTED",
@@ -52,10 +50,10 @@ def test_conversion_usd(utils_convertation):
     }
 
     mock_requests = Mock()
-    mock_requests.get.return_value.json.return_value = utils_convertation
+    mock_requests.get.return_value.json.return_value = utils_conversion
 
     with patch("src.external_api.requests", mock_requests):
-        assert convertetion(usd_test) == 41106.850000000006
+        assert conversion(usd_test) == 41106.850000000006
 
 
 @patch("pandas.read_csv")

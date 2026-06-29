@@ -107,7 +107,7 @@ def utils_json():
 
 
 @pytest.fixture
-def utils_convertation():
+def utils_conversion():
     return {
         "Date": "2026-06-18T11:30:00+03:00",
         "PreviousDate": "2026-06-17T11:30:00+03:00",

@@ -43,3 +43,7 @@ def count_operations_by_category(data: List[Dict[str, Any]], categories: List[st
                 break
 
     return result
+
+
+def filter_rub_only() -> None:
+    return None
