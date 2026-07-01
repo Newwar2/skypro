@@ -21,20 +21,22 @@
 
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import logging
+
+from mypy.state import state
+
 from src.utils import read_json, conversion, transactions_csv, transactions_excel
-
-# Если filter_by_status и другие фильтры нужны — импортируй из src.transactions
-# from src.transactions import filter_by_status, process_bank_search, count_operations_by_category
-
+from src.transactions import process_bank_search, count_operations_by_category, filter_rub_only
 VALID_STATUSES = {"EXECUTED", "CANCELED", "PENDING"}
 
-logger = __import__("logging").getLogger("utils")  # используем логгер из utils (там уже настроен)
+# Используем тот же логгер, что и в utils (чтобы все логи были в одном файле)
+logger = logging.getLogger("utils")
 
 
 def get_valid_status() -> str:
-    """Запрашивает у пользователя корректный статус из VALID_STATUSES."""
     while True:
         user_input = input(
             "Введите статус, по которому необходимо выполнить фильтрацию.\n"
@@ -53,7 +55,6 @@ def get_valid_status() -> str:
 
 
 def ask_yes_no(question: str) -> bool:
-    """Спрашивает Да/Нет, принимает разные варианты ввода."""
     while True:
         answer = input(question).strip().lower()
         if answer in ("да", "д", "yes", "y"):
@@ -65,7 +66,6 @@ def ask_yes_no(question: str) -> bool:
 
 
 def parse_date(date_str: Any) -> Optional[datetime]:
-    """Пытается распарсить дату из строки в нескольких форматах."""
     if not date_str:
         return None
 
@@ -88,8 +88,6 @@ def sort_transactions(
         data: List[Dict[str, Any]],
         ascending: bool
 ) -> List[Dict[str, Any]]:
-    """Сортирует транзакции по дате. Если дата невалидна — относит к самому старому."""
-
     def key_func(item: Dict[str, Any]) -> datetime:
         dt = parse_date(item.get("date"))
         return dt if dt is not None else datetime.min
@@ -98,7 +96,6 @@ def sort_transactions(
 
 
 def filter_rub_only(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Оставляет только RUB-транзакции (по полю currency)."""
     result: List[Dict[str, Any]] = []
     for item in data:
         currency = (item.get("currency") or "").strip().upper()
@@ -111,7 +108,6 @@ def filter_by_description(
         data: List[Dict[str, Any]],
         search_word: str
 ) -> List[Dict[str, Any]]:
-    """Фильтрует по подстроке в description (регистронезависимо)."""
     search = search_word.lower()
     result: List[Dict[str, Any]] = []
     for item in data:
@@ -122,17 +118,14 @@ def filter_by_description(
 
 
 def convert_to_rub(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Конвертирует суммы всех транзакций в рубли с помощью conversion()."""
     converted: List[Dict[str, Any]] = []
     for tx in data:
-        # Создаём копию, чтобы не менять оригинал
         tx_copy = dict(tx)
         try:
             tx_copy["amount_rub"] = conversion(tx)
             converted.append(tx_copy)
         except Exception as e:
             logger.exception("Ошибка конвертации транзакции: %s", e)
-            # Пропускаем или оставляем как есть — на твой выбор. Сейчас пропускаем.
             continue
     return converted
 
@@ -177,7 +170,6 @@ def print_transactions(data: List[Dict[str, Any]]) -> None:
         if details:
             print(details)
 
-        # Если есть конвертированная сумма — показываем её
         if "amount_rub" in op:
             print(format_amount(op["amount_rub"], "RUB"))
         else:
@@ -185,16 +177,33 @@ def print_transactions(data: List[Dict[str, Any]]) -> None:
         print()
 
 
-def load_data_by_choice(choice: str, file_path: str) -> List[Dict[str, Any]]:
-    if choice == "1":
-        # JSON: путь относительный или абсолютный, read_json ожидает полный путь
-        return read_json(file_path)
-    elif choice == "2":
-        return transactions_csv(file_path)
-    elif choice == "3":
-        return transactions_excel(file_path)
-    else:
-        raise ValueError("Неверный выбор типа файла")
+def load_data_by_choice(choice: str, file_path_raw: str) -> List[Dict[str, Any]]:
+    path = Path(file_path_raw).resolve()
+    logger.info("Попытка загрузки данных. Тип: %s, абсолютный путь: %s", choice, path)
+
+    if not path.exists():
+        logger.error("Файл не найден по абсолютному пути: %s", path)
+        raise FileNotFoundError(f"Файл не найден: {path}")
+
+    if path.is_dir():
+        logger.error("Указан каталог вместо файла: %s", path)
+        raise ValueError("Путь должен указывать на файл, а не на директорию.")
+
+    try:
+        if choice == "1":
+            data = read_json(str(path))
+        elif choice == "2":
+            data = transactions_csv(str(path))
+        elif choice == "3":
+            data = transactions_excel(str(path))
+        else:
+            raise ValueError("Неверный выбор типа файла")
+
+        logger.info("Файл успешно прочитан. Загружено транзакций: %d", len(data))
+        return data
+    except Exception as e:
+        logger.exception("Критическая ошибка при чтении файла: %s", e)
+        raise
 
 
 def main() -> None:
@@ -228,62 +237,83 @@ def main() -> None:
     try:
         data = load_data_by_choice(choice, file_path)
     except FileNotFoundError as e:
-        print(f"Ошибка: файл не найден: {e}")
+        print(f"Ошибка: файл не найден. Проверьте путь и попробуйте снова.\nДетали: {e}")
+        sys.exit(1)
+    except ValueError as e:
+        print(f"Ошибка в параметрах: {e}")
         sys.exit(1)
     except Exception as e:
         print(f"Произошла ошибка при чтении файла: {e}")
         sys.exit(1)
 
     if not data:
+        # Это не обязательно ошибка: файл может быть валидным, но пустым
+        logger.warning("Файл прочитан, но список транзакций пуст.")
         print("Предупреждение: файл прочитан, но транзакций не найдено.")
         return
 
     logger.info("Загружено транзакций: %d", len(data))
 
     # 1. Фильтр по статусу
-    status = get_valid_status()
-    print(f'Программа: Операции отфильтрованы по статусу "{status}".')
-    # Здесь можно подключить filter_by_status из transactions.py, если нужно
-    # filtered = filter_by_status(data, status)
-    filtered = [tx for tx in data if tx.get("status", "").upper() == status]
-
+    user_state = get_valid_status()
+    print(f'Программа: Операции отфильтрованы по статусу "{user_state}".')
+    filtered = [tx for tx in data if tx.get("state", "").upper() == user_state]
+    logger.info("После фильтра по статусу осталось транзакций: %d", len(filtered))
     if not filtered:
-        print("Программа: Не найдено ни одной транзакции с указанным статусом.")
+        print("Программа: После фильтрации по статусу список пуст. Дальнейшие фильтры не имеют смысла.")
         return
 
-    # 2. Сортировка по дате
-    sort_by_date = ask_yes_no("Программа: Отсортировать операции по дате? Да/Нет\n> ")
-    if sort_by_date:
-        order = input("Программа: Сортировать по возрастанию или по убыванию?\n> ").strip().lower()
-        ascending = order in ("возрастанию", "asc", "по возрастанию", "вверх")
-        filtered = sort_transactions(filtered, ascending)
+    # 2. Поиск по описанию
+    search_desc = ask_yes_no(
+        "Программа: Отфильтровать список транзакций по определённому слову/фразе в описании? Да/Нет\n> ")
+    if search_desc:
+        word = input("Введите слово или регулярное выражение для поиска в описании:\n> ").strip()
+        if word:
+            filtered = process_bank_search(filtered, word)
+            logger.info("После поиска по описанию осталось транзакций: %d", len(filtered))
 
     # 3. Только RUB
     rub_only = ask_yes_no("Программа: Выводить только рублёвые транзакции? Да/Нет\n> ")
     if rub_only:
         filtered = filter_rub_only(filtered)
+        logger.info("После фильтрации RUB осталось транзакций: %d", len(filtered))
+        if not filtered:
+            print("Программа: После фильтрации RUB список пуст.")
+            # Можно сразу выйти, чтобы не делать лишние шаги
+            # return
 
-    # 4. Поиск по описанию
-    search_desc = ask_yes_no(
-        "Программа: Отфильтровать список транзакций по определённому слову в описании? Да/Нет\n> "
+    # 4. Сортировка по дате
+    sort_by_date = ask_yes_no("Программа: Отсортировать операции по дате? Да/Нет\n> ")
+    if sort_by_date:
+        order = input("Программа: Сортировать по возрастанию или по убыванию?\n> ").strip().lower()
+        ascending = order in ("возрастанию", "asc", "по возрастанию", "вверх")
+        filtered = sort_transactions(filtered, ascending)
+        logger.info("После сортировки осталось транзакций: %d", len(filtered))
+
+    # 5. Подсчёт категорий
+    count_by_cat = ask_yes_no(
+        "Программа: Подсчитать количество операций по заданным категориям? Да/Нет\n> "
     )
-    if search_desc:
-        word = input("Введите слово для поиска в описании:\n> ").strip()
-        if word:
-            filtered = filter_by_description(filtered, word)
+    if count_by_cat:
+        cats_input = input("Введите названия категорий через запятую:\n> ").strip()
+        categories = [c.strip() for c in cats_input.split(",") if c.strip()]
+        if categories:
+            counts = count_operations_by_category(filtered, categories)
+            print("\n--- Подсчёт операций по категориям ---")
+            for cat, cnt in counts.items():
+                print(f"{cat}: {cnt}")
+            print("-------------------------------------\n")
 
-    # 5. Конвертация в RUB (если не отфильтровали только RUB)
-    # Если пользователь выбрал «только RUB», конвертация всё равно может быть полезна,
-    # если в данных есть RUB, но хочется унифицировать поле суммы.
+    # 6. Конвертация
     convert = ask_yes_no(
         "Программа: Конвертировать суммы всех транзакций в рубли (с использованием API курсов)? Да/Нет\n> "
     )
     if convert:
         filtered = convert_to_rub(filtered)
+        logger.info("После конвертации осталось транзакций: %d", len(filtered))
 
     print("Программа: Распечатываю итоговый список транзакций...\n")
     print_transactions(filtered)
-
 
 if __name__ == "__main__":
     main()
