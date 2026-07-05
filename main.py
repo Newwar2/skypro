@@ -98,7 +98,7 @@ def sort_transactions(
 def filter_rub_only(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     result: List[Dict[str, Any]] = []
     for item in data:
-        currency = (item.get("currency") or "").strip().upper()
+        currency = (item.get("currency_code") or "").strip().upper()
         if currency == "RUB":
             result.append(item)
     return result
@@ -179,6 +179,7 @@ def print_transactions(data: List[Dict[str, Any]]) -> None:
 
 def load_data_by_choice(choice: str, file_path_raw: str) -> List[Dict[str, Any]]:
     path = Path(file_path_raw).resolve()
+    print(path)
     logger.info("Попытка загрузки данных. Тип: %s, абсолютный путь: %s", choice, path)
 
     if not path.exists():
@@ -257,7 +258,7 @@ def main() -> None:
     # 1. Фильтр по статусу
     user_state = get_valid_status()
     print(f'Программа: Операции отфильтрованы по статусу "{user_state}".')
-    filtered = [tx for tx in data if tx.get("state", "").upper() == user_state]
+    filtered = [tx for tx in data if str(tx.get("state", "")).upper() == user_state]
     logger.info("После фильтра по статусу осталось транзакций: %d", len(filtered))
     if not filtered:
         print("Программа: После фильтрации по статусу список пуст. Дальнейшие фильтры не имеют смысла.")

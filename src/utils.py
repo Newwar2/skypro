@@ -32,8 +32,18 @@ def read_json(path_json: str) -> Any:
     logger_utils.debug("Функция read_json, которая принимает на вход путь до JSON-файла - запустилась.")
     try:
         logger_utils.info("Попытка открыть и прочитать JSON-файл.")
-        with open(path_json) as file:
-            data = json.load(file)
+        with open(path_json, encoding="utf-8") as file:
+            data = [{
+                "id" : data.get("id"),
+            "state" : data.get("state"),
+            "date" : data.get("date"),
+            "amount" : data.get("operationAmount", {}).get("amount"),
+            "currency_name" : data.get("operationAmount", {}).get("currency",{}).get("name"),
+            "currency_code" : data.get("operationAmount", {}).get("currency",{}).get("code"),
+            "from"  : data.get("from"),
+            "to" : data.get("to"),
+            "description" : data.get("description"),
+            } for data in json.load(file)]
             logger_utils.info("JSON-файл успешно прочитан.")
     except FileNotFoundError:
         logger_utils.error("Файл не найден. Возвращается пустой список.")
@@ -48,9 +58,9 @@ def read_json(path_json: str) -> Any:
 def conversion(transaction: dict) -> float:
     """Функция, которая принимает на вход транзакцию и возвращает сумму транзакции (amount) в рублях."""
     logger_utils.debug("Функция convertetion запущена, начинаем обработку транзакций")
-    code: str = transaction["operationAmount"]["currency"]["code"]  # показывает, что используется другая валюта
+    code: str = transaction["currency_code"]  # показывает, что используется другая валюта
     logger_utils.info("Определён код валюты")
-    rub_pay: float = float(transaction["operationAmount"]["amount"])
+    rub_pay: float = float(transaction["amount"])
     logger_utils.info("Сумма в исходной валюте")
     if code == "RUB":
         logger_utils.info("Валюта уже в рублях, конвертация не требуется. Возвращаем сумму rub_pay")
@@ -66,7 +76,6 @@ def conversion(transaction: dict) -> float:
 
 def transactions_csv(file_path: str) -> List[Dict[str, Any]]:
     # 1. Превращаем строку пути в удобный объект Path
-    file_path = f"{ROOT_DIR}//{file_path}"
     path = Path(file_path)
 
     # 2. Проверяем: существует ли файл и является ли он файлом (а не папкой)
